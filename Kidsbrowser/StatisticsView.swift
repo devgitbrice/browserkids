@@ -115,6 +115,7 @@ struct DetailStatView: View {
     let item: HistoryItem
     @State private var player: AVPlayer?
     @State private var isPlaying = false
+    @State private var playbackObserver: NSObjectProtocol?
     
     var body: some View {
         ScrollView {
@@ -137,7 +138,7 @@ struct DetailStatView: View {
                             .background(Color.orange.opacity(0.1))
                             .cornerRadius(10)
                         
-                        Text("Texte lu par Arthur :")
+                        Text("Texte lu par \(SupabaseManager.shared.currentProfile) :")
                             .font(.subheadline).foregroundColor(.secondary)
                         
                         Text(item.details.text_read ?? "Texte non disponible")
@@ -194,7 +195,13 @@ struct DetailStatView: View {
             }
         }
         .navigationTitle("Détail de l'exercice")
-        .onDisappear { player?.pause() }
+        .onDisappear {
+            player?.pause()
+            if let observer = playbackObserver {
+                NotificationCenter.default.removeObserver(observer)
+                playbackObserver = nil
+            }
+        }
     }
     
     // --- GESTION AUDIO CORRIGÉE ---
@@ -216,9 +223,12 @@ struct DetailStatView: View {
         } else {
             player?.play()
             isPlaying = true
-            
-            // Auto-reset à la fin
-            NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem, queue: .main) { _ in
+
+            // Auto-reset à la fin (on supprime l'ancien observer avant d'en ajouter un nouveau)
+            if let observer = playbackObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            playbackObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem, queue: .main) { _ in
                 self.isPlaying = false
                 self.player?.seek(to: .zero)
             }

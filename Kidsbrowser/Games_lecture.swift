@@ -11,9 +11,7 @@ import Combine
 import Supabase
 
 // --- CONFIGURATION ---
-let supabaseUrl = URL(string: "https://lomgelwpxlzynuogxsri.supabase.co")!
-let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxvbWdlbHdweGx6eW51b2d4c3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMTQ2MDgsImV4cCI6MjA4MTc5MDYwOH0.aUty5KjHdr0dJVH1ubEKqYz9D1M4u1w1LYhys7dr0Cg"
-let supabase = SupabaseClient(supabaseURL: supabaseUrl, supabaseKey: supabaseKey)
+// Utilise le client centralisé de SupabaseManager au lieu de dupliquer les credentials
 let storageUrl = "https://lomgelwpxlzynuogxsri.supabase.co/storage/v1/object/public/lectures/"
 
 // --- CLASSE AUDIO (Doit être en dehors de la View) ---
@@ -59,7 +57,7 @@ class AudioRecorder: NSObject, ObservableObject {
                 let audioData = try Data(contentsOf: fileUrl)
                 let uniqueID = UUID().uuidString
                 let cloudFileName = "lecture_\(uniqueID).m4a"
-                try await supabase.storage.from("lectures").upload(cloudFileName, data: audioData, options: FileOptions(contentType: "audio/m4a"))
+                try await SupabaseManager.shared.client.storage.from("lectures").upload(cloudFileName, data: audioData, options: FileOptions(contentType: "audio/m4a"))
                 DispatchQueue.main.async { self.isUploading = false; completion(cloudFileName) }
             } catch {
                 print("❌ Erreur Supabase : \(error)")
@@ -144,6 +142,7 @@ struct LectureGameView: View {
     }
     
     func startSession(shuffle: Bool, limit: Int? = nil) {
+        guard !rawDbContents.isEmpty else { return }
         var playlist = shuffle ? rawDbContents.shuffled() : rawDbContents
         if let max = limit {
             var temp: [String] = []

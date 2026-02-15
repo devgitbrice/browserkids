@@ -22,7 +22,7 @@ struct GlobalIntroView: View {
                     .scaleEffect(1.2)
                     .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: true)
                 
-                Text("C'est parti Arthur !")
+                Text("C'est parti \(SupabaseManager.shared.currentProfile) !")
                     .font(.system(size: 50, weight: .heavy, design: .rounded))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -65,7 +65,7 @@ struct GlobalSuccessView: View {
                     .animation(.spring(response: 0.5, dampingFraction: 0.3, blendDuration: 0).repeatForever(autoreverses: true), value: true)
                 
                 VStack(spacing: 10) {
-                    Text("Bravo Arthur !")
+                    Text("Bravo \(SupabaseManager.shared.currentProfile) !")
                         .font(.system(size: 60, weight: .black, design: .rounded))
                         .foregroundColor(.white)
                     

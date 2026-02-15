@@ -176,7 +176,7 @@ struct WriteGameView: View {
                 }
             } catch {
                 print("❌ Erreur chargement: \(error)")
-                self.isLoading = false
+                await MainActor.run { self.isLoading = false }
             }
         }
     }
