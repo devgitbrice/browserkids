@@ -119,8 +119,12 @@ struct ContentView: View {
                         Group {
                             switch item.type {
                             case .web(let urlString):
-                                WebView(url: URL(string: urlString)!)
-                                    .onAppear { isMonitoringActive = true }
+                                if let webURL = URL(string: urlString) {
+                                    WebView(url: webURL)
+                                        .onAppear { isMonitoringActive = true }
+                                } else {
+                                    Text("URL invalide").foregroundColor(.red)
+                                }
                             case .quiz:
                                 GameView(onUnlock: { returnToHome() })
                                     .onAppear { isMonitoringActive = false }

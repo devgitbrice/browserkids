@@ -57,41 +57,39 @@ struct SessionConfigView: View {
                                 .font(.caption).foregroundColor(.gray)
                                 .listRowBackground(Color.clear)
                             
-                            List {
-                                ForEach($localGames) { $game in
-                                    HStack {
-                                        // Icône selon le type
-                                        Image(systemName: iconForType(game.type))
-                                            .foregroundColor(colorForType(game.type))
-                                            .font(.title2)
-                                            .frame(width: 30)
-                                        
-                                        VStack(alignment: .leading) {
-                                            Text(game.type.rawValue)
-                                                .font(.headline)
-                                            
-                                            // Réglage du nombre de questions
-                                            if game.isEnabled {
-                                                HStack {
-                                                    Text("Objectif :")
-                                                        .font(.caption).foregroundColor(.gray)
-                                                    Stepper("\(game.questionCount)", value: $game.questionCount, in: 1...50)
-                                                        .font(.subheadline)
-                                                }
-                                            } else {
-                                                Text("Désactivé").font(.caption).foregroundColor(.red)
+                            ForEach($localGames) { $game in
+                                HStack {
+                                    // Icône selon le type
+                                    Image(systemName: iconForType(game.type))
+                                        .foregroundColor(colorForType(game.type))
+                                        .font(.title2)
+                                        .frame(width: 30)
+
+                                    VStack(alignment: .leading) {
+                                        Text(game.type.rawValue)
+                                            .font(.headline)
+
+                                        // Réglage du nombre de questions
+                                        if game.isEnabled {
+                                            HStack {
+                                                Text("Objectif :")
+                                                    .font(.caption).foregroundColor(.gray)
+                                                Stepper("\(game.questionCount)", value: $game.questionCount, in: 1...50)
+                                                    .font(.subheadline)
                                             }
+                                        } else {
+                                            Text("Désactivé").font(.caption).foregroundColor(.red)
                                         }
-                                        
-                                        Spacer()
-                                        
-                                        // Toggle Activé/Désactivé
-                                        Toggle("", isOn: $game.isEnabled)
-                                            .labelsHidden()
                                     }
+
+                                    Spacer()
+
+                                    // Toggle Activé/Désactivé
+                                    Toggle("", isOn: $game.isEnabled)
+                                        .labelsHidden()
                                 }
-                                .onMove(perform: moveGame)
                             }
+                            .onMove(perform: moveGame)
                         }
                     }
                     
